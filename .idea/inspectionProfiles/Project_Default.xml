@@ -1,0 +1,57 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="ignoredPackages">
+        <value>
+          <list size="23">
+            <item index="0" class="java.lang.String" itemvalue="nrn-subprocess" />
+            <item index="1" class="java.lang.String" itemvalue="coverage" />
+            <item index="2" class="java.lang.String" itemvalue="scipy" />
+            <item index="3" class="java.lang.String" itemvalue="errr" />
+            <item index="4" class="java.lang.String" itemvalue="morphio" />
+            <item index="5" class="java.lang.String" itemvalue="bsb-hdf5" />
+            <item index="6" class="java.lang.String" itemvalue="pynrrd" />
+            <item index="7" class="java.lang.String" itemvalue="scikit-learn" />
+            <item index="8" class="java.lang.String" itemvalue="h5py" />
+            <item index="9" class="java.lang.String" itemvalue="pre-commit" />
+            <item index="10" class="java.lang.String" itemvalue="black" />
+            <item index="11" class="java.lang.String" itemvalue="plotly" />
+            <item index="12" class="java.lang.String" itemvalue="numpy" />
+            <item index="13" class="java.lang.String" itemvalue="zwembad" />
+            <item index="14" class="java.lang.String" itemvalue="rtree" />
+            <item index="15" class="java.lang.String" itemvalue="toml" />
+            <item index="16" class="java.lang.String" itemvalue="psutil" />
+            <item index="17" class="java.lang.String" itemvalue="mpilock" />
+            <item index="18" class="java.lang.String" itemvalue="dbbs_models" />
+            <item index="19" class="java.lang.String" itemvalue="colour" />
+            <item index="20" class="java.lang.String" itemvalue="appdirs" />
+            <item index="21" class="java.lang.String" itemvalue="nrn-patch" />
+            <item index="22" class="java.lang.String" itemvalue="NEURON" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E203" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N801" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyProtectedMemberInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyRedundantParenthesesInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="true" />
+      <option name="processComments" value="true" />
+    </inspection_tool>
+  </profile>
+</component>

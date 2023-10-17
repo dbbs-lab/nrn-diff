@@ -42,3 +42,20 @@ def nrn_diff(left, right):
                     for (left_child, right_child) in differ.get_children(memo)[::-1]
                 )
     return diff_bag
+
+
+# NEURON patches
+
+
+def _nrnmech_hash(self):
+    return hash(f"seg:{hash(self.segment())}:mech:{self.name()}")
+
+
+def _nrnmech_eq(self, other):
+    return hash(self) == hash(other)
+
+
+from neuron import nrn
+
+nrn.Mechanism.__hash__ = _nrnmech_hash
+nrn.Mechanism.__eq__ = _nrnmech_eq

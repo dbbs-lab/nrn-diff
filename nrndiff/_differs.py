@@ -1,13 +1,13 @@
-import abc
+import abc as _abc
 from . import _differences
-from neuron import nrn
+from neuron import nrn as _nrn
 
 
 def get_differ_for(t):
     return Differ._differs.get(t, None)
 
 
-class Differ(abc.ABC):
+class Differ(_abc.ABC):
     _differs = {}
 
     def __init__(self, left, right, parent):
@@ -37,7 +37,7 @@ class Differ(abc.ABC):
     def get_diff(self):
         return [d for d in self.get_possible_differences() if d.is_different()]
 
-    @abc.abstractmethod
+    @_abc.abstractmethod
     def get_possible_differences(self):
         pass
 
@@ -54,7 +54,7 @@ class TypeDiffer(Differ, difftype=type):
         return [type_diff] if type_diff.is_different() else [typeid_diff]
 
 
-class SectionDiffer(Differ, difftype=nrn.Section):
+class SectionDiffer(Differ, difftype=_nrn.Section):
     def get_possible_differences(self):
         return [
             _differences.SectionLengthDifference(self),
@@ -74,7 +74,7 @@ class SectionDiffer(Differ, difftype=nrn.Section):
         ]
 
 
-class SegmentDiffer(Differ, difftype=nrn.Segment):
+class SegmentDiffer(Differ, difftype=_nrn.Segment):
     def get_possible_differences(self):
         return [
             _differences.SegmentXDifference(self),

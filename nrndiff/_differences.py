@@ -69,6 +69,43 @@ class SectionDiamDifference(AttributeDifference, attr="diam"):
     pass
 
 
+class SectionAxialResistanceDifference(AttributeDifference, attr="Ra"):
+    pass
+
+
+class SectionMembraneCapacitanceDifference(AttributeDifference, attr="cm"):
+    pass
+
+
+class SectionMembranePotentialDifference(AttributeDifference, attr="v"):
+    pass
+
+
+class SectionDiscretizationDifference(AttributeDifference, attr="nseg"):
+    def continue_diff(self):
+        return not self.is_different()
+
+
+class SegmentXDifference(AttributeDifference, attr="x"):
+    pass
+
+
+class SegmentAreaDifference(AttributeDifference, attr="area"):
+    pass
+
+
+class SegmentVolumeDifference(AttributeDifference, attr="volume"):
+    pass
+
+
+class SegmentInputResistanceDifference(AttributeDifference, attr="ri"):
+    pass
+
+
+class SegmentPotentialDifference(AttributeDifference, attr="v"):
+    pass
+
+
 class SectionChildrenDifference(Difference):
     def get_values(self):
         # todo: Maybe try to puzzle together a way to stable sort sections to improve

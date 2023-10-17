@@ -13,15 +13,15 @@ class TestTypeDiff(unittest.TestCase):
         diff = nrn_diff(5, [])
         self.assertEqual(1, len(diff), "Type diff expected between int and list")
         typediff = diff[0]
-        self.assertEqual("TypeDifference", typediff.name)
+        self.assertIsInstance(typediff, _differences.TypeDifference)
 
     def test_typeid_diff_with_primitives(self):
         diff = nrn_diff(5, True)
         self.assertEqual(1, len(diff), "Type diff expected between int and bool")
         typediff = diff[0]
-        self.assertEqual(
-            "TypeIdentityDifference",
-            typediff.name,
+        self.assertIsInstance(
+            typediff,
+            _differences.TypeIdentityDifference,
             "int and bool should have child-parent relationship",
         )
 
@@ -55,7 +55,9 @@ class TestSectionDiff(unittest.TestCase):
         diff = nrn_diff(a, b)
         self.assertEqual(
             1,
-            len([d for d in diff if d.name == "SectionPointDifference"]),
+            len(
+                [d for d in diff if isinstance(d, _differences.SectionPointDifference)]
+            ),
             f"Point difference expected",
         )
         b.pt3dadd(0, 0, 0, 0)
@@ -77,13 +79,21 @@ class TestSegmentDiff(unittest.TestCase):
         diff = nrn_diff(a, b)
         self.assertEqual(0, len(diff), f"no difference expected")
 
+    def test_segment_nosecdiff(self):
+        s1 = h.Section()
+        s2 = h.Section()
+        a = s1(0.5)
+        b = s2(0.5)
+        diff = nrn_diff(a, b)
+        self.assertEqual(0, len(diff), f"no difference expected")
+
     def test_segment_x_diff(self):
         s = h.Section()
         a = s(0.5)
         b = s(0.7)
         diff = nrn_diff(a, b)
         self.assertEqual(1, len(diff), f"x difference expected")
-        self.assertEqual("SegmentXDifference", diff[0].name)
+        self.assertIsInstance(diff[0], _differences.SegmentXDifference)
 
     def test_segment_attr_diff(self):
         sizediff = {
@@ -115,3 +125,63 @@ class TestSegmentDiff(unittest.TestCase):
                     set(type(d) for d in diff),
                     f"Modifying {attr} should give {expected}",
                 )
+
+    def test_segment_mech_diff(self):
+        a = h.Section()
+        a.insert("pas")
+        b = h.Section()
+        diff = nrn_diff(a, b)
+        self.assertIsInstance(
+            diff[0], _differences.SegmentMechanismDifference, "mechdiff expected"
+        )
+        b.insert("pas")
+        diff = nrn_diff(a, b)
+        self.assertEqual(0, len(diff), "no diff expected")
+
+
+class TestMechanismDiff(unittest.TestCase):
+    def test_mech_nodiff(self):
+        a = h.Section()
+        b = h.Section()
+        a.insert("pas")
+        b.insert("pas")
+
+        diff = nrn_diff(a(0.5).pas, b(0.5).pas)
+        self.assertEqual(0, len(diff), "no diff expected")
+
+    def test_mech_sourcediff(self):
+        a = h.Section()
+        b = h.Section()
+        a.insert("pas")
+        b.insert("hh")
+
+        diff = nrn_diff(a(0.5).pas, b(0.5).hh)
+        self.assertEqual(1, len(diff), "source diff expected")
+        self.assertIsInstance(diff[0], _differences.SourceDifference)
+
+
+class TestParamDiff(unittest.TestCase):
+    def test_param_nodiff(self):
+        a = h.Section()
+        b = h.Section()
+        a.insert("pas")
+        b.insert("pas")
+        ag = next(iter(a(0.5).pas))
+        bg = next(iter(b(0.5).pas))
+
+        diff = nrn_diff(ag, bg)
+        self.assertEqual(0, len(diff), "no diff expected")
+
+    def test_param_diff(self):
+        a = h.Section()
+        b = h.Section()
+        a.insert("pas")
+        b.insert("pas")
+        b.g_pas = b.g_pas**2 + b.g_pas + 10
+        ag = next(iter(a(0.5).pas))
+        bg = next(iter(b(0.5).pas))
+        print(a(0.5).pas.g, b(0.5).pas.g)
+
+        diff = nrn_diff(ag, bg)
+        self.assertEqual(1, len(diff), "diff expected")
+        self.assertIsInstance(diff[0], _differences.ParameterDifference)

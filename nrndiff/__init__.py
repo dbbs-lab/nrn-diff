@@ -4,6 +4,7 @@ NEURON object differ. Recursively finds differences between objects in NEURON.
 import gc
 from typing import List, TYPE_CHECKING
 from collections import deque
+from . import _patches
 from ._differs import TypeDiffer as _TypeDiffer, get_differ_for
 
 __version__ = "0.0.1"
@@ -48,34 +49,3 @@ def nrn_diff(left, right) -> List["Difference"]:
     del memo
     gc.collect()
     return diff_bag
-
-
-# NEURON patches
-
-
-def _nrnmech_hash(self):
-    return hash(f"seg:{hash(self.segment())}:mech:{self.name()}")
-
-
-def _nrnrangevar_hash(self):
-    return hash(f"seg:{hash(self.mech().segment())}:param:{self.name()}")
-
-
-def _hash_eq(self, other):
-    return hash(self) == hash(other)
-
-
-from neuron import nrn as _nrn, h as _h
-
-_s = _h.Section()
-_s.insert("pas")
-_RangeVar = type(next(iter(_s(0.5).pas)))
-
-_nrn.Mechanism.__hash__ = _nrnmech_hash
-_RangeVar.__hash__ = _nrnrangevar_hash
-_nrn.Mechanism.__eq__ = _hash_eq
-_RangeVar.__eq__ = _hash_eq
-
-del _s
-_nrn.RangeVar = _RangeVar
-gc.collect()

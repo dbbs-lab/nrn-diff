@@ -56,10 +56,9 @@ class AttributeDifference(Difference):
         return True
 
     def get_values(self):
-        return (
-            getattr(self._differ.left, self._attr),
-            getattr(self._differ.right, self._attr),
-        )
+        l = getattr(self._differ.left, self._attr)
+        r = getattr(self._differ.right, self._attr)
+        return (l(), r()) if callable(l) else (l, r)
 
 
 class SectionLengthDifference(AttributeDifference, attr="L"):

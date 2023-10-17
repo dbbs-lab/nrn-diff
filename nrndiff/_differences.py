@@ -1,5 +1,6 @@
 import abc as _abc
 import numpy as _np
+from neuron import h as _h
 
 
 class Difference(_abc.ABC):
@@ -133,3 +134,35 @@ class SectionChildrenDifference(Difference):
     def is_different(self):
         left_children, right_children = self.get_values()
         return len(left_children) != len(right_children)
+
+
+class SegmentMechanismDifference(Difference):
+    def get_values(self):
+        return [*self.differ.left], [*self.differ.right]
+
+    def is_different(self):
+        left, right = self.get_values()
+        left_set = sorted(mech.name() for mech in left)
+        right_set = sorted(mech.name() for mech in right)
+        return left_set != right_set
+
+
+class SourceDifference(Difference):
+    def get_values(self):
+        left_source = getattr(_h, self.differ.left.name()).file
+        right_source = getattr(_h, self.differ.right.name()).file
+        return left_source, right_source
+
+
+class ParameterDifference(Difference):
+    def continue_diff(self):
+        return True
+
+    def get_values(self):
+        # Compare parameter value, even though it might be missing on the right side:
+        # differences in mechanism will be detected at some point anyway covering the
+        # false positives in this logic.
+        pname = self.differ.left.name()[: -len(self.differ.left.mech().name()) - 1]
+        l = getattr(self._differ.left.mech(), pname, None)
+        r = getattr(self._differ.right.mech(), pname, None)
+        return l, r

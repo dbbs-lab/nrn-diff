@@ -69,9 +69,12 @@ class SectionDiffer(Differ, difftype=_nrn.Section):
         ]
 
     def get_children(self, memo):
+        child_sections = _differences.SectionChildrenDifference(self).get_values()
         return [
-            *zip(self.left, self.right),
-            *zip(*_differences.SectionChildrenDifference(self).get_values()),
+            # Child segments
+            *_zip_memo(memo, self.left, self.right),
+            # Child sections
+            *_zip_memo(memo, *child_sections),
         ]
 
 
@@ -86,4 +89,25 @@ class SegmentDiffer(Differ, difftype=_nrn.Segment):
         ]
 
     def get_children(self, memo):
-        return [*zip(self.left, self.right)]
+        return [
+            # Parent section
+            *_single_memo(memo, self.left.sec, self.right.sec),
+            # Child mechanisms
+            *_zip_memo(memo, self.left, self.right),
+        ]
+
+
+def _zip_memo(memo: set, left, right):
+    left = [l for l in left if l not in memo]
+    right = [r for r in right if r not in memo]
+    memo.update(left)
+    memo.update(right)
+    return zip(left, right)
+
+
+def _single_memo(memo: set, left, right):
+    if left in memo or right in memo:
+        return []
+    memo.add(left)
+    memo.add(right)
+    return [(left, right)]

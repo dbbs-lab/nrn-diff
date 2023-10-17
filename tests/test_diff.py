@@ -1,5 +1,6 @@
 import unittest
 from nrndiff import nrn_diff
+from nrndiff import _differences
 from neuron import h
 
 
@@ -66,3 +67,51 @@ class TestSectionDiff(unittest.TestCase):
         a.pt3dadd(0, 0, 0, 0.1)
         diff = nrn_diff(a, b)
         self.assertEqual(1, len(diff), f"diam point difference expected")
+
+
+class TestSegmentDiff(unittest.TestCase):
+    def test_segment_nodiff(self):
+        s = h.Section()
+        a = s(0.5)
+        b = s(0.5)
+        diff = nrn_diff(a, b)
+        self.assertEqual(0, len(diff), f"no difference expected")
+
+    def test_segment_x_diff(self):
+        s = h.Section()
+        a = s(0.5)
+        b = s(0.7)
+        diff = nrn_diff(a, b)
+        self.assertEqual(1, len(diff), f"x difference expected")
+        self.assertEqual("SegmentXDifference", diff[0].name)
+
+    def test_segment_attr_diff(self):
+        sizediff = {
+            _differences.SegmentAreaDifference,
+            _differences.SegmentVolumeDifference,
+            _differences.SegmentInputResistanceDifference,
+        }
+        irdiff = {_differences.SegmentInputResistanceDifference}
+        vdiff = {_differences.SegmentPotentialDifference}
+        for (attr, expected) in (
+            ("L", sizediff),
+            ("diam", sizediff),
+            ("nseg", sizediff),
+            ("Ra", irdiff),
+            ("cm", set()),
+            ("v", vdiff),
+        ):
+            with self.subTest(attr=attr):
+                a = h.Section()
+                b = h.Section()
+                # Change value of one section and repeat diff
+                v = getattr(a, attr)
+                setattr(b, attr, v**2 + v + 10)
+                diff = nrn_diff(a(0.5), b(0.5))
+                # Filter out diffs that we find as seg's parent sec diffs
+                diff = [d for d in diff if d.differ.parent is None]
+                self.assertEqual(
+                    expected,
+                    set(type(d) for d in diff),
+                    f"Modifying {attr} should give {expected}",
+                )

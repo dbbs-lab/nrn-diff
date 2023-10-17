@@ -59,8 +59,30 @@ class SectionDiffer(Differ, difftype=nrn.Section):
         return [
             _differences.SectionLengthDifference(self),
             _differences.SectionDiamDifference(self),
+            _differences.SectionAxialResistanceDifference(self),
+            _differences.SectionMembraneCapacitanceDifference(self),
+            _differences.SectionMembranePotentialDifference(self),
+            _differences.SectionDiscretizationDifference(self),
+            _differences.SectionPointDifference(self),
             _differences.SectionChildrenDifference(self),
         ]
 
     def get_children(self, memo):
-        return [*zip(*_differences.SectionChildrenDifference(self).get_values())]
+        return [
+            *zip(self.left, self.right),
+            *zip(*_differences.SectionChildrenDifference(self).get_values()),
+        ]
+
+
+class SegmentDiffer(Differ, difftype=nrn.Segment):
+    def get_possible_differences(self):
+        return [
+            _differences.SegmentXDifference(self),
+            _differences.SegmentAreaDifference(self),
+            _differences.SegmentVolumeDifference(self),
+            _differences.SegmentInputResistanceDifference(self),
+            _differences.SegmentPotentialDifference(self),
+        ]
+
+    def get_children(self, memo):
+        return [*zip(self.left, self.right)]

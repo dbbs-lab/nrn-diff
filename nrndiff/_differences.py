@@ -1,4 +1,5 @@
 import abc as _abc
+import numpy as _np
 
 
 class Difference(_abc.ABC):
@@ -104,6 +105,23 @@ class SegmentInputResistanceDifference(AttributeDifference, attr="ri"):
 
 class SegmentPotentialDifference(AttributeDifference, attr="v"):
     pass
+
+
+class SectionPointDifference(Difference):
+    def get_values(self):
+        l, r = self.differ.left, self.differ.right
+        return (
+            _np.array(
+                [(l.x3d(i), l.y3d(i), l.z3d(i), l.diam3d(i)) for i in range(l.n3d())]
+            ),
+            _np.array(
+                [(r.x3d(i), r.y3d(i), r.z3d(i), r.diam3d(i)) for i in range(r.n3d())]
+            ),
+        )
+
+    def is_different(self):
+        l, r = self.get_values()
+        return l.shape != r.shape or not _np.allclose(l, r)
 
 
 class SectionChildrenDifference(Difference):

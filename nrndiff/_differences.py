@@ -1,7 +1,7 @@
-import abc
+import abc as _abc
 
 
-class Difference:
+class Difference(_abc.ABC):
     def __init__(self, differ):
         self._differ = differ
 
@@ -16,7 +16,7 @@ class Difference:
     def continue_diff(self):
         return not self.is_different()
 
-    @abc.abstractmethod
+    @_abc.abstractmethod
     def get_values(self):
         pass
 

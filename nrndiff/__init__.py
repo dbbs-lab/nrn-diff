@@ -1,7 +1,8 @@
 """
 NEURON object differ. Recursively finds differences between objects in NEURON.
 """
-
+import gc
+from typing import List, TYPE_CHECKING
 from weakref import WeakSet
 from collections import deque
 from ._differs import TypeDiffer as _TypeDiffer, get_differ_for
@@ -9,10 +10,13 @@ from ._differs import TypeDiffer as _TypeDiffer, get_differ_for
 __version__ = "0.0.1"
 __all__ = ["nrn_diff", "get_differ_for"]
 
+if TYPE_CHECKING:
+    from ._differences import Difference
 
-def nrn_diff(left, right):
+
+def nrn_diff(left, right) -> List["Difference"]:
     diff_bag = []
-    memo = WeakSet()
+    memo = set()
     # The stack starts with a node of the given arguments and no parent differ.
     stack = deque([(left, right, None)])
     while True:
@@ -42,6 +46,8 @@ def nrn_diff(left, right):
                     (left_child, right_child, differ)
                     for (left_child, right_child) in differ.get_children(memo)[::-1]
                 )
+    del memo
+    gc.collect()
     return diff_bag
 
 

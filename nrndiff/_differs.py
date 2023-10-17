@@ -3,7 +3,8 @@ from . import _differences
 from neuron import nrn as _nrn
 
 
-def get_differ_for(t):
+def get_differ_for(nrnobj):
+    t = type(nrnobj)
     return Differ._differs.get(t, None)
 
 

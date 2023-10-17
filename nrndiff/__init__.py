@@ -4,9 +4,10 @@ NEURON object differ. Recursively finds differences between objects in NEURON.
 
 from weakref import WeakSet
 from collections import deque
-from ._differs import TypeDiffer as _TypeDiffer, get_differ_for as _get_differ_for
+from ._differs import TypeDiffer as _TypeDiffer, get_differ_for
 
 __version__ = "0.0.1"
+__all__ = ["nrn_diff", "get_differ_for"]
 
 
 def nrn_diff(left, right):
@@ -26,7 +27,7 @@ def nrn_diff(left, right):
         # If there is no type nrn_diff, or it's not a drastic type nrn_diff, check for normal nrn_diff
         if not type_diffs or all(diff.continue_diff() for diff in type_diffs):
             # See if there is a differ defined for this type, if not, skip this node
-            differ_type = _get_differ_for(type(left))
+            differ_type = get_differ_for(left)
             if not differ_type:
                 continue
             differ = differ_type(left, right, parent)

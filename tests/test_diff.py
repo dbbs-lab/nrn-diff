@@ -10,7 +10,11 @@ class TestTypeDiff(unittest.TestCase):
         self.assertEqual(0, len(diff), "No type diff expected between int")
 
     def test_type_diff_with_primitives(self):
-        diff = nrn_diff(5, [])
+        class hashlist(list):
+            def __hash__(self):
+                return id(self)
+
+        diff = nrn_diff(5, hashlist())
         self.assertEqual(1, len(diff), "Type diff expected between int and list")
         typediff = diff[0]
         self.assertIsInstance(typediff, _differences.TypeDifference)
@@ -180,7 +184,6 @@ class TestParamDiff(unittest.TestCase):
         b.g_pas = b.g_pas**2 + b.g_pas + 10
         ag = next(iter(a(0.5).pas))
         bg = next(iter(b(0.5).pas))
-        print(a(0.5).pas.g, b(0.5).pas.g)
 
         diff = nrn_diff(ag, bg)
         self.assertEqual(1, len(diff), "diff expected")

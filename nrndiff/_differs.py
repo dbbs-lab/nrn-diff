@@ -42,7 +42,7 @@ class Differ(_abc.ABC):
     def get_possible_differences(self):
         pass
 
-    def get_children(self, memo):
+    def get_children(self):
         return []
 
 
@@ -68,14 +68,14 @@ class SectionDiffer(Differ, difftype=_nrn.Section):
             _differences.SectionChildrenDifference(self),
         ]
 
-    def get_children(self, memo):
+    def get_children(self):
         # Use the difference class because it sorts the values
         child_sections = _differences.SectionChildrenDifference(self).get_values()
         return [
             # Child segments
-            *_zip_memo(memo, self.left, self.right),
+            *zip(self.left, self.right),
             # Child sections
-            *_zip_memo(memo, *child_sections),
+            *zip(*child_sections),
         ]
 
 
@@ -90,14 +90,14 @@ class SegmentDiffer(Differ, difftype=_nrn.Segment):
             _differences.SegmentMechanismDifference(self),
         ]
 
-    def get_children(self, memo):
+    def get_children(self):
         # Use the difference class because it sorts the values
         child_mechs = _differences.SegmentMechanismDifference(self).get_values()
         return [
-            # Parent section
-            *_single_memo(memo, self.left.sec, self.right.sec),
             # Child mechanisms
-            *_zip_memo(memo, *child_mechs),
+            *zip(*child_mechs),
+            # Parent section
+            (self.left.sec, self.right.sec),
         ]
 
 
@@ -105,12 +105,18 @@ class MechanismDiffer(Differ, difftype=_nrn.Mechanism):
     def get_possible_differences(self):
         return [_differences.SourceDifference(self)]
 
-    def get_children(self, memo):
+    def get_children(self):
+        c = [
+            # Parent segment
+            (self.left.segment(), self.right.segment()),
+            # Child parameters
+            *zip(self.left, self.right),
+        ]
         return [
             # Parent segment
-            *_single_memo(memo, self.left.segment(), self.right.segment()),
+            (self.left.segment(), self.right.segment()),
             # Child parameters
-            *_zip_memo(memo, self.left, self.right),
+            *zip(self.left, self.right),
         ]
 
 
@@ -118,21 +124,8 @@ class ParameterDiffer(Differ, difftype=_nrn.RangeVar):
     def get_possible_differences(self):
         return [_differences.ParameterDifference(self)]
 
-    def get_children(self, memo):
-        return _single_memo(memo, self.left.mech(), self.right.mech())
-
-
-def _zip_memo(memo: set, left, right):
-    left = [l for l in left if l not in memo]
-    right = [r for r in right if r not in memo]
-    memo.update(left)
-    memo.update(right)
-    return zip(left, right)
-
-
-def _single_memo(memo: set, left, right):
-    if left in memo or right in memo:
-        return []
-    memo.add(left)
-    memo.add(right)
-    return [(left, right)]
+    def get_children(self):
+        return [
+            # Parent mech
+            (self.left.mech(), self.right.mech())
+        ]

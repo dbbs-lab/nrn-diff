@@ -6,9 +6,11 @@ from typing import List, TYPE_CHECKING
 from collections import deque
 from . import _patches
 from ._differs import TypeDiffer as _TypeDiffer, get_differ_for
+from ._util import Memo
 
 __version__ = "0.0.1"
 __all__ = ["nrn_diff", "get_differ_for"]
+
 
 if TYPE_CHECKING:
     from ._differences import Difference
@@ -16,7 +18,7 @@ if TYPE_CHECKING:
 
 def nrn_diff(left, right) -> List["Difference"]:
     diff_bag = []
-    memo = set()
+    memo = Memo({left, right})
     # The stack starts with a node of the given arguments and no parent differ.
     stack = deque([(left, right, None)])
     while True:
@@ -41,10 +43,10 @@ def nrn_diff(left, right) -> List["Difference"]:
             # No diffs that terminate diffing?
             if all(diff.continue_diff() for diff in diffs):
                 # Then extend the stack with all the NEURON objects related to this pair
-                # that we haven't visited yet.
+                # that we haven't visited yet, and add them to the memo.
                 stack.extend(
                     (left_child, right_child, differ)
-                    for (left_child, right_child) in differ.get_children(memo)[::-1]
+                    for (left_child, right_child) in memo.visit(differ.get_children())
                 )
     del memo
     gc.collect()

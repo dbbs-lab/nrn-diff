@@ -8,7 +8,7 @@ from . import _patches
 from ._differs import TypeDiffer as _TypeDiffer, get_differ_for
 from ._util import Memo
 
-__version__ = "0.0.1"
+__version__ = "0.0.3"
 __all__ = ["nrn_diff", "get_differ_for"]
 
 

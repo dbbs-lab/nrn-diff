@@ -15,6 +15,17 @@ class Difference(_abc.ABC):
     def differ(self):
         return self._differ
 
+    @property
+    def left(self):
+        return self._differ.left
+
+    @property
+    def right(self):
+        return self._differ.right
+
+    def get_labels(self):
+        return str(self.left), str(self.right)
+
     def continue_diff(self):
         return not self.is_different()
 
@@ -155,6 +166,12 @@ class SourceDifference(Difference):
 
 
 class ParameterDifference(Difference):
+    def get_labels(self):
+        return (
+            f"{self.left.mech().segment().name()}.{self.left.name()}",
+            f"{self.right.mech().segment().name()}.{self.right.name()}",
+        )
+
     def continue_diff(self):
         return True
 
